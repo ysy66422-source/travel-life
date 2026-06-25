@@ -1,0 +1,120 @@
+/* 본문 폰트: Pretendard Variable (self-host, dynamic-subset로 필요한 글리프만 로드).
+   가변 폰트라 전 weight를 단일 파일로 커버해 CSS/네트워크 비용을 최소화한다.
+   로고용 GangwonEduPower 미보유 시 sans fallback */
+@import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 모바일 화면 기준이므로 기본 폰트와 안티앨리어싱만 전역으로 지정한다. */
+@layer base {
+  html,
+  body,
+  #root {
+    @apply h-full;
+  }
+
+  body {
+    /* 전체 프레임 배경은 흰색. 메인 페이지의 #F4F4F4는 MAIN 영역에서만 적용한다. */
+    @apply bg-white font-sans text-ink antialiased;
+  }
+}
+
+@layer components {
+  /* 375px 디자인을 뷰포트 폭 비율(--app-zoom)로 확대/축소한다.
+     zoom은 레이아웃 박스에 반영되므로 세로 스크롤이 정상 동작한다. */
+  .app-shell {
+    zoom: var(--app-zoom, 1);
+  }
+
+  /* 검색창 그라데이션 테두리(2px). padding-box/border-box 이중 배경으로
+     실제 border-width를 사용해 둥근 모서리에서도 두께가 균일하다.
+     conic-gradient의 시작 각도(--search-angle)를 회전시켜
+     색이 테두리를 따라 도는 효과를 만든다. */
+  .search-field {
+    border: 3px solid transparent;
+    border-radius: 20px;
+    background:
+      linear-gradient(#fff, #fff) padding-box,
+      conic-gradient(
+          from var(--search-angle),
+          #d2169f,
+          #a012e6,
+          #006fff,
+          #d2169f
+        )
+        border-box;
+    animation: search-border-spin 2s linear infinite;
+  }
+
+  /* "다음 여행계획" 영역이 위쪽 그라데이션 카드 뒤에서 아래로 미끄러져 나오는 진입 효과.
+     그라데이션 카드를 z-10으로 덮고, 이 영역은 자기 높이만큼 위로 숨겨진 상태에서 시작한다. */
+  .next-trip-reveal {
+    animation: next-trip-slide-down 1s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
+  }
+}
+
+/* 커스텀 프로퍼티를 애니메이션 가능하도록 등록(각도 보간). 미등록 시 각도가 보간되지 않아 회전이 끊긴다. */
+@property --search-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes search-border-spin {
+  to {
+    --search-angle: 360deg;
+  }
+}
+
+/* 카드 뒤에서 아래로 미끄러져 내려오며 나타난다. */
+@keyframes next-trip-slide-down {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* 모션 최소화 선호 사용자는 애니메이션을 끄고 정적 상태로 둔다. */
+@media (prefers-reduced-motion: reduce) {
+  .search-field,
+  .next-trip-reveal {
+    animation: none;
+  }
+}
+
+@layer utilities {
+  /* 가로 슬라이드 영역에서 스크롤바를 숨겨 깔끔한 스와이프 UX를 제공한다. */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* 가로 슬라이드 영역의 좌우 가장자리를 투명하게 페이드 처리(마스크)한다.
+     로고 자체가 아니라 양쪽 끝에서 자연스럽게 사라지는 효과를 준다. */
+  .mask-fade-x {
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      #000 28px,
+      #000 calc(100% - 28px),
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      #000 28px,
+      #000 calc(100% - 28px),
+      transparent 100%
+    );
+  }
+}
