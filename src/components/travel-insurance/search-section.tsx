@@ -22,7 +22,7 @@ export const SearchSection = ({
 }: SearchSectionProps) => {
   return (
     <div className="flex w-full flex-col gap-16">
-      <SectionTitle>국내 여행지 정보 검색!!!!!</SectionTitle>
+      <SectionTitle>해외 여행지 정보 검색</SectionTitle>
       {/* 입력 대신 버튼으로 두어 포커스/커서 없이 터치만으로 화면을 전환한다. */}
       <button
         type="button"
